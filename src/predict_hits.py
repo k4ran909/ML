@@ -8,7 +8,7 @@ from rdkit.Chem import MACCSkeys
 from rdkit.Chem import Descriptors
 
 # Paths
-MODEL_SAVE_PATH = r"C:\Users\k4ran\OneDrive\Desktop\ML\trained_models.pkl"
+MODEL_SAVE_PATH = os.path.join(os.path.dirname(__file__), "..", "models", "trained_models.pkl")
 
 def generate_features_for_hits(smiles_list, descriptor_names):
     """Generate MACCS keys and RDKit 2D Descriptors for screening hits."""
@@ -102,7 +102,7 @@ def predict(hits_data):
     df = df.sort_values(by="Consensus_Active_Prob", ascending=False)
     
     # Save predictions
-    output_path = r"C:\Users\k4ran\OneDrive\Desktop\ML\hits_ml_predictions.csv"
+    output_path = os.path.join(os.path.dirname(__file__), "..", "results", "hits_ml_predictions.csv")
     df.to_csv(output_path, index=False)
     print(f"\nPredictions saved to {output_path}")
     

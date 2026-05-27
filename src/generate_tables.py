@@ -18,9 +18,9 @@ from sklearn.linear_model import LogisticRegression
 from xgboost import XGBClassifier
 
 # Paths
-DATASET_PATH = r"C:\Users\k4ran\OneDrive\Desktop\ML\data\processed\dataset_with_ic50.csv"
-MODEL_SAVE_PATH = r"C:\Users\k4ran\OneDrive\Desktop\ML\models\trained_models.pkl"
-HITS_PATH = r"C:\Users\k4ran\OneDrive\Desktop\ML\results\hit_predictions_results.csv"
+DATASET_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "processed", "dataset_with_ic50.csv")
+MODEL_SAVE_PATH = os.path.join(os.path.dirname(__file__), "..", "models", "trained_models.pkl")
+HITS_PATH = os.path.join(os.path.dirname(__file__), "..", "results", "hit_predictions_results.csv")
 
 def generate_features(smiles_list):
     maccs_features = []
@@ -193,7 +193,7 @@ def main():
     print("="*95)
     
     # Save markdown version for the user
-    markdown_path = r"C:\Users\k4ran\OneDrive\Desktop\ML\results\exact_tables_report.md"
+    markdown_path = os.path.join(os.path.dirname(__file__), "..", "results", "exact_tables_report.md")
     with open(markdown_path, "w", encoding="utf-8") as f:
         f.write("# Replicated Tables Report\n\n")
         f.write("### Table 1: Performance Indices for 5-Fold Cross Validation Using our Trained ML Classifiers\n\n")
