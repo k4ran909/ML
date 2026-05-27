@@ -9,7 +9,8 @@ scripts = [
     ("resolve_and_predict.py", "3. Resolving hit structures & predicting pocket binding probabilities"),
     ("admet_prediction.py", "4. Computing Lipinski properties & ESOL solubility profiling"),
     ("feature_importance.py", "5. Generating descriptor feature weights & saving importance plots"),
-    ("generate_tables.py", "6. Formatting cross-validation results & creating markdown reports")
+    ("generate_tables.py", "6. Formatting cross-validation results & creating markdown reports"),
+    ("generate_dashboard.py", "7. Building interactive HTML browser dashboard")
 ]
 
 src_dir = os.path.dirname(os.path.abspath(__file__))
