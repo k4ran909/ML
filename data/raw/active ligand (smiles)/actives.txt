@@ -1,0 +1,37 @@
+actives
+
+1.CC1=C2[C@H](C(=O)[C@@]3([C@H](C[C@@H]4[C@]([C@H]3[C@@H]([C@@](C2(C)C)(C[C@@H]1OC(=O)[C@@H]([C@H](C5=CC=CC=C5)NC(=O)C6=CC=CC=C6)O)O)OC(=O)C7=CC=CC=C7)(CO4)OC(=O)C)O)C)OC(=O)C (Paclitaxel)
+2.CC1=C2[C@H](C(=O)[C@@]3([C@H](C[C@@H]4[C@]([C@H]3[C@@H]([C@@](C2(C)C)(C[C@@H]1OC(=O)[C@@H]([C@H](C5=CC=CC=C5)NC(=O)OC(C)(C)C)O)O)OC(=O)C6=CC=CC=C6)(CO4)OC(=O)C)O)C)O (Docetaxel)
+3.CC1=C2[C@H](C(=O)[C@@]3([C@H](C[C@@H]4[C@]([C@H]3[C@@H]([C@@](C2(C)C)(C[C@@H]1OC(=O)[C@@H]([C@H](C5=CC=CC=C5)NC(=O)OC(C)(C)C)O)O)OC(=O)C6=CC=CC=C6)(CO4)OC(=O)C)OC)C)OC (Cabazitaxel)
+4.C[C@H]1CCC[C@@]2([C@@H](O2)C[C@H](NC(=O)C[C@@H](C(C(=O)[C@@H]([C@H]1O)C)(C)C)O)/C(=C/C3=CSC(=N3)C)/C)C (Ixabepilone)
+5.C[C@H]1CCC[C@@]2([C@@H](O2)C[C@H](OC(=O)C[C@@H](C(C(=O)[C@@H]([C@H]1O)C)(C)C)O)/C(=C/C3=CSC(=N3)C)/C)C (Epothilone B)
+6.C[C@H]1CCC[C@@H]2[C@@H](O2)C[C@H](OC(=O)C[C@@H](C(C(=O)[C@@H]([C@H]1O)C)(C)C)O)/C(=C/C3=CSC(=N3)C)/C (Epothilone A)
+7.CC1=C2[C@@H]3[C@H]([C@@]4(CC[C@@H]5[C@]([C@H]4[C@@H]([C@@](C2(C)C)(C[C@@H]1OC(=O)[C@@H]([C@H](C6=C(C=CC=N6)F)NC(=O)OC(C)(C)C)O)O)OC(=O)C7=CC=CC=C7)(CO5)OC(=O)C)C)O[C@@H](O3)CN(C)C (Tesetaxel)
+8.CCC(=O)O[C@H]1C[C@@H]2[C@@](CO2)([C@@H]3[C@@]1(C(=O)[C@@H](C4=C([C@H](C[C@@]([C@H]3OC(=O)C5=CC=CC=C5)(C4(C)C)O)OC(=O)[C@@H]([C@H](C6=CC=CO6)NC(=O)OC(C)(C)C)O)C)O)C)OC(=O)C (Milataxel)
+9.CC1=C2[C@H](C(=O)[C@@]3([C@H](C[C@@H]4[C@]([C@H]3[C@@H]([C@@]5(C2(C)C)[C@H]([C@@H]1OC(=O)[C@@H]([C@H](CC(C)C)NC(=O)OC(C)(C)C)O)OC(=O)O5)OC(=O)C6=CC=CC=C6)(CO4)OC(=O)C)O)C)OC(=O)C (Ortataxel)
+10.CC1=C2[C@@H]([C@H]3[C@@]4([C@H](C[C@@H]5[C@]([C@H]4[C@@H]([C@@](C2(C)C)(C[C@@H]1OC(=O)[C@@H]([C@H](CC(C)C)NC(=O)OC(C)(C)C)O)O)OC(=O)C6=CC=CC=C6)(CO5)OC(=O)C)OC(O3)C=C)C)OC(=O)C (Tpi 287)
+11.CC1=C2[C@H](C(=O)[C@]34C[C@H]3C[C@@H]5[C@]([C@H]4[C@@H]([C@@](C2(C)C)(C[C@@H]1OC(=O)[C@@H]([C@H](C6=CC=CC=C6)NC(=O)OC(C)(C)C)O)O)OC(=O)C7=CC=CC=C7)(CO5)OC(=O)C)OC(=O)C (Larotaxel)
+12.C[C@H]1[C@@H](OC(=O)[C@@H]([C@H]1O)C)C[C@@H](/C=C\[C@H](C)[C@@H]([C@@H](C)/C=C(/C)\C[C@H](C)[C@H]([C@H](C)[C@H]([C@@H](C)/C=C\C=C)OC(=O)N)O)O)O (Disermolide)
+13.CC1=C2[C@H](C(=O)[C@@]3([C@H](C[C@@H]4[C@]([C@H]3[C@@H]([C@@](C2(C)C)(C[C@@H]1OC(=O)[C@@H]([C@H](C(C)(C)C)NC(=O)OC(C)(C)C)O)O)OC(=O)C5=CC=CC=C5)(CO4)OC(=O)OC)O)C)OC(=O)C (Bms-275183)
+14.C/C=C/C=C\C(=O)N[C@H]([C@@H]1C/C(=C/[C@@H]2CC(=C)C[C@@H](O2)C/C=C/C(=O)C/C(=C\C=C\C(=O)O1)/C)/C)O (Zampanolide)
+15.C[C@H]1[C@@H](OC(=O)[C@@H]([C@H]1O)C)C[C@@H](/C=C\[C@H](C)[C@@H]([C@@H](C)/C=C(/C)\C[C@H](C)[C@H]([C@H](C)[C@H]([C@@H](C)/C=C\C=C)OC(=O)N)O)O)O (Disermolide)
+16.CC1=CC[C@@H]([C@@H]/2[C@H]1C[C@@H]([C@@]3(C=C[C@@](O3)(/C(=C2)/CO[C@H]4[C@H]([C@@H]([C@@H](CO4)O)O)OC(=O)C)OC)C)OC(=O)/C=C/C5=CN(C=N5)C)C(C)C (Eleutherobin)
+17.CC1=CC[C@@H]([C@@H]/2[C@H]1C[C@@H]([C@@]3(C=C[C@@](O3)(/C(=C2)/C(=O)OC)O)C)OC(=O)/C=C/C4=CN(C=N4)C)C(C)C (Sarcodictyin A)
+18.C[C@@H]([C@@H]1C/C=C/C(=O)N[C@@H](C(=O)NCC(C(=O)O[C@H](C(=O)O1)CC(C)C)(C)C)CC2=CC(=C(C=C2)OC)Cl)[C@@H]3[C@H](O3)C4=CC=CC=C4 (Cryptophycin 52)
+19.CNC1=NC2=C(C(=O)N=CC=C2N1)CC3=CC(=C(C(=C3)Br)OC)Br (Ceratamine B)
+20.CC[C@H](CO)/C=C(/C)\[C@H]1C[C@@H](C[C@H](C([C@]2([C@H]([C@H](C[C@H](O2)C[C@@H]([C@H](C(=O)O1)O)OC)OC)O)O)(C)C)O)OC (Peloruside A)
+21.C[C@@H](C(F)(F)F)NC1=C(C(=NC2=NC=NN12)Cl)C3=C(C=C(C=C3F)OCCCNC)F (Cevipabulin)
+22.C[C@H]1[C@@H](OC(=O)[C@@H]([C@H]1O)C)C[C@@H](/C=C\[C@H](C)[C@@H]([C@@H](C)/C=C(/C)\C[C@H](C)[C@H]([C@H](C)[C@H]([C@@H](C)/C=C\C=C)OC(=O)N)O)O)O (Disermolide)
+23.C1=CC=C2C(=C1)C(=CN2CC3=CC=C(C=C3)Cl)C(=O)C(=O)NC4=CC=NC=C4 (Indibulin)
+24.CN1CCC2=CC3=C(C(=C2[C@@H]1[C@@H]4C5=C(C(=C(C=C5)OC)OC)C(=O)O4)OC)OCO3 (Noscapine)
+25.C[C@]12CC[C@H]3[C@H]([C@@H]1CC[C@@H]2O)CCC4=C3C=CC(=C4)OC(=O)N(CCCl)CCCl (Estramustine)
+26.C[C@H]1CCC/C(=C\C[C@H](OC(=O)C[C@@H](C(C(=O)[C@@H]([C@H]1O)C)(C)C)O)/C(=C/C2=CSC(=N2)C)/C)/C (Epothilone D)
+27.C[C@H]1CCC[C@@]2([C@@H](O2)C[C@H](OC(=O)C[C@@H](C(C(=O)[C@@H]([C@H]1O)CC=C)(C)C)O)C3=CC4=C(C=C3)SC(=N4)C)C (Sagopilone)
+28.C[C@H]1[C@H]2[C@@H]([C@@H]([C@@H]3[C@@]2([C@H]([C@H]([C@H]4[C@H]3[C@H](C(=O)[C@@H]5[C@@]4([C@H]([C@@H]6[C@H](C5)O6)OC(=O)C)C)O)OC(=O)C)OC(=O)C)C)O)[C@]7([C@](C(=O)O[C@]78[C@H]1O8)(C)O)C (taccalonolide AJ)
+29.CC1=C2[C@H](C(=O)[C@@]3([C@H](C[C@@H]4[C@]([C@H]3[C@@H]([C@@](C2(C)C)(C[C@@H]1OC(=O)[C@@H]([C@H](C5=CC=CC=C5)NC(=O)OC(C)(C)C)O)O)OC(=O)C6=CC=CC=C6)(CO4)OC(=O)C)OC)C)OC (Cabazitaxel)
+30.C[C@H]1CC[C@H]([C@@H]([C@@H](OC(=O)/C=C\C=C\[C@H]([C@H](C[C@@H](/C=C\[C@@H]([C@@H]([C@H](C1)C)O)C)O)O)C)[C@@H](C)/C=C\C=C)C)O (Dictyostatin)
+
+
+
+
+

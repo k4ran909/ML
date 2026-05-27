@@ -1,0 +1,17 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.ipynb_checkpoints
+
+# Environment
+.venv/
+venv/
+env/
+.env
+
+# Large files / IDEs
+.idea/
+.vscode/
+*.log
