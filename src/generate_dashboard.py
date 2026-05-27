@@ -689,6 +689,15 @@ def main():
         f.write(html_content)
         
     print(f"Interactive dashboard successfully generated at: {OUTPUT_HTML_PATH}")
+    
+    # Automatically open the dashboard in the default web browser
+    try:
+        import webbrowser
+        html_url = 'file://' + os.path.abspath(OUTPUT_HTML_PATH).replace('\\', '/')
+        print(f"Opening dashboard in browser: {html_url}")
+        webbrowser.open(html_url)
+    except Exception as e:
+        print(f"Note: Could not open browser automatically: {e}")
 
 if __name__ == "__main__":
     main()
