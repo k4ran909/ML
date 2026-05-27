@@ -2,6 +2,12 @@
 
 An end-to-end computational drug discovery pipeline combining **homology modeling**, **structure-based virtual screening (molecular docking)**, **multi-algorithm machine learning classification**, and **ADMET profiling** to identify and prioritize novel natural product hits targeting the **taxane binding site** of human $\alpha\beta_{\text{III}}$ tubulin.
 
+## ⚡ Quick Start: Run Entire Pipeline
+To automatically execute all stages of the pipeline sequentially (from database mining to final report formatting and plotting):
+```bash
+py src/all.py
+```
+
 ---
 
 ## 🧬 1. Executive Summary & Biological Target
