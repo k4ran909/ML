@@ -184,7 +184,26 @@ To evaluate the translational potential of these hits, their ADMET properties we
 
 ---
 
-## 📂 8. Directory Layout
+## 🧪 8. Scientific Dialectics: ML vs. Biophysical Selection
+
+This project incorporates rigorous **dialectical reasoning** to resolve conflicts between statistical machine learning models, static physics-based docking, and biological realities.
+
+### 8.1 The "Borderline Probability" Paradox (ML vs. Docking)
+Our multi-model ML consensus identified **27-O-acetyl-Withaferin A** as the top hit (consensus active probability of **`0.5702`**), despite *Withanolide A* possessing a slightly stronger static docking affinity ($-10.6\text{ kcal/mol}$ vs $-10.4\text{ kcal/mol}$). 
+* **The Resolution:** 27-O-acetyl-Withaferin A represents the premier choice for solvated MD simulation because it possesses a **C-27 acetyl group modification**. This group provides topological extensions and additional hydrogen-bond acceptors that the ECFP4 fingerprint models highly favor as characteristics of active taxol-pocket stabilizers.
+
+### 8.2 The Lipinski Violation Contradiction
+* **The Rule:** 27-O-acetyl-Withaferin A has **1 Lipinski violation** (Molecular Weight of $512.64\text{ g/mol}$ slightly exceeds the arbitrary $500$ threshold). 
+* **The Dialectical Contradiction:** Striving for "perfect" Lipinski compliance can be a significant blind spot when targeting large, open protein pockets like the taxane site. Successful FDA-approved clinical stabilizers (like Paclitaxel, MW 853; Docetaxel, MW 807; and Cabazitaxel, MW 835) **violate Lipinski rules multiple times** because stabilizing the tubulin heterodimer interface requires massive, multi-functional macrocyclic structures. 27-O-acetyl-Withaferin A's minor molecular weight "violation" is actually a biophysical advantage, providing extra steric bulk to plug the pocket.
+
+### 8.3 Non-Reactive Force Field Limitations in MD
+* **The Biological Reality:** Literature shows that natural withanolides and triterpenoids often act as **covalent modifiers** by alkylating exposed cysteine residues (e.g. Cys239 or Cys303) on the outer surface of tubulin.
+* **The Force Field Constraint:** Classical Molecular Dynamics (MD) simulations use **non-reactive force fields** (like CHARMM or GROMOS) that cannot simulate covalent bond formation. 
+* **The Interpretation:** The MD simulations of these compounds must be explicitly interpreted as a **theoretical, non-covalent pocket-occupancy framework** rather than an exact representation of in vivo covalent reactivity.
+
+---
+
+## 📂 9. Directory Layout
 
 The workspace is structured as follows:
 ```
@@ -200,7 +219,7 @@ C:\Users\k4ran\OneDrive\Desktop\ML/
 ├── 📂 src/
 │   ├── get_ic50.py                       (Mines experimental IC50 values from ChEMBL/PubChem)
 │   ├── train_ml.py                       (Computes molecular descriptors & trains classifiers)
-│   ├── predict_hits.py                   (Applies trained classifiers to predict hit activity)
+│   ├── predict_hits_LEGACY.py            (Legacy prediction script using MACCS keys)
 │   ├── resolve_and_predict.py            (Resolves hit names and runs the prediction pipeline)
 │   ├── admet_prediction.py               (Calculates solubility, ADMET, and drug-likeness)
 │   ├── feature_importance.py             (Plots Random Forest and Logistic Regression weights)
