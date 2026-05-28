@@ -8,15 +8,15 @@ This manual provides a highly detailed, step-by-step workflow of the entire comp
 
 ```mermaid
 graph TD
-    A[ChEMBL API Target Queries] --> B[Data Cleaning & Normalization]
-    B --> C[Balanced Training Set: 300 Compounds]
-    C --> D[Morgan Fingerprints ECFP4 + RDKit 2D]
-    D --> E[MinMaxScaler [0,1] + 0.05 Weighting]
-    E --> F[SelectKBest k=100 Feature Selection]
-    F --> G[Regularized Classifiers Training]
-    G --> H[Consensus Screening of 7 Hits]
-    H --> I[Decisive MD Candidate Selection]
-    I --> J[50 ns Solvated MD Simulation]
+    A["ChEMBL API Target Queries"] --> B["Data Cleaning & Normalization"]
+    B --> C["Balanced Training Set: 300 Compounds"]
+    C --> D["Morgan Fingerprints ECFP4 + RDKit 2D"]
+    D --> E["MinMaxScaler [0,1] + 0.05 Weighting"]
+    E --> F["SelectKBest k=100 Feature Selection"]
+    F --> G["Regularized Classifiers Training"]
+    G --> H["Consensus Screening of 7 Hits"]
+    H --> I["Decisive MD Candidate Selection"]
+    I --> J["50 ns Solvated MD Simulation"]
 ```
 
 ### Step 1: Experimental Bioactivity Data Mining (`src/get_ic50.py`)
