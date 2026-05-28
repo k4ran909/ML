@@ -69,6 +69,13 @@ def main():
     print("[SUCCESS] Entire machine learning and ADMET pipeline completed successfully!")
     print("   All results, tables, and charts are updated in the 'results/' folder.")
     print("="*75)
+    print("\n" + " "*22 + "DEVELOPED & RESEARCHED BY:")
+    print(" "*17 + "  ____  ___  ____ _   _    _")
+    print(" "*17 + " |  _ \\|_ _/ ___| | | |  / \\")
+    print(" "*17 + " | |_) || | |   | |_| | / _ \\")
+    print(" "*17 + " |  _ < | | |___|  _  |/ ___ \\")
+    print(" "*17 + " |_| \\_\\___\\____|_| |_/_/   \\_\\")
+    print("\n" + "="*75)
 
 if __name__ == "__main__":
     main()
