@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 MODEL_SAVE_PATH = os.path.join(os.path.dirname(__file__), "..", "models", "trained_models.pkl")
 OUTPUT_PLOT_PATH = os.path.join(os.path.dirname(__file__), "..", "results", "feature_importance.png")
 
-# Selected human-readable explanations for common RDKit 2D descriptors to make output scientifically meaningful
+# Explanations for RDKit 2D descriptors
 DESCRIPTOR_EXPLANATIONS = {
     "MolLogP": "Octanol-Water Partition Coefficient (Lipophilicity)",
     "MolWt": "Molecular Weight",
@@ -25,29 +25,22 @@ DESCRIPTOR_EXPLANATIONS = {
     "NumAliphaticRings": "Number of Aliphatic Rings",
     "NumAromaticRings": "Number of Aromatic Rings",
     "NumSaturatedRings": "Number of Saturated Rings",
-    "BertzCT": "Bertz Complexity Index"
-}
-
-# Standard biological descriptions of selected MACCS keys related to tubulin activity
-MACCS_EXPLANATIONS = {
-    136: "Presence of Amide Group (O=C-N)",
-    139: "Presence of Hydroxyl Group (OH)",
-    120: "Presence of Heteroatom Ring (carbon-heteroatom ring)",
-    84: "Presence of Carbonyl Group (C=O)",
-    72: "Presence of Oxygen Atom bound to Ring",
-    65: "Presence of Ester/Ether linkage",
-    125: "Presence of Aromatic Ring",
-    143: "Presence of Halogen Atom"
+    "BertzCT": "Bertz Complexity Index",
+    "fr_lactone": "Number of lactone rings (found in taxol/withanolide)",
+    "fr_methoxy": "Number of methoxy groups (critical for RF tubulin activity)",
+    "fr_ester": "Number of ester groups",
+    "fr_ring": "Number of rings"
 }
 
 def get_feature_meaning(feat_name):
     """Return a scientific explanation for a feature name."""
     if feat_name in DESCRIPTOR_EXPLANATIONS:
         return DESCRIPTOR_EXPLANATIONS[feat_name]
-    if feat_name.startswith("MACCS_"):
+    if feat_name.startswith("ECFP4_Bit_"):
         try:
-            bit = int(feat_name.split("_")[1])
-            return MACCS_EXPLANATIONS.get(bit, f"MACCS Key structural fragment (Bit {bit})")
+            bit = int(feat_name.split("_")[2])
+            # Give a general biological meaning for ECFP4 bits in virtual screening
+            return f"ECFP4 topological bit {bit} (represents a local circular substructure/pharmacophore)"
         except ValueError:
             pass
     return "Chemical/Structural property"
@@ -61,18 +54,26 @@ def main():
         saved_data = pickle.load(f)
         
     models = saved_data["models"]
+    scaler = saved_data["scaler"]
+    selector = saved_data["selector"]
     descriptor_names = saved_data["descriptor_names"]
     
-    # Create the complete list of feature names
-    maccs_names = [f"MACCS_{i}" for i in range(1, 167)]
-    feature_names = maccs_names + descriptor_names
+    # Reconstruct the complete list of original feature names
+    morgan_names = [f"ECFP4_Bit_{i}" for i in range(2048)]
+    all_feature_names = morgan_names + descriptor_names
+    
+    # Get the support mask from SelectKBest (k=100)
+    support_mask = selector.get_support()
+    selected_feature_names = [all_feature_names[i] for i, supported in enumerate(support_mask) if supported]
+    
+    print(f"Loaded model package. Mapped {len(selected_feature_names)} features used in training.")
     
     # 1. Extract Random Forest Feature Importances
     rf_model = models.get("Random Forest")
     rf_importances = rf_model.feature_importances_
     
     rf_df = pd.DataFrame({
-        "Feature": feature_names,
+        "Feature": selected_feature_names,
         "Importance": rf_importances
     }).sort_values(by="Importance", ascending=False)
     
@@ -81,7 +82,7 @@ def main():
     lr_coefs = np.abs(lr_model.coef_[0]) # take absolute value for magnitude of impact
     
     lr_df = pd.DataFrame({
-        "Feature": feature_names,
+        "Feature": selected_feature_names,
         "Importance": lr_coefs
     }).sort_values(by="Importance", ascending=False)
     

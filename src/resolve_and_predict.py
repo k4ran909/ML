@@ -5,7 +5,7 @@ import pickle
 import numpy as np
 import pandas as pd
 from rdkit import Chem
-from rdkit.Chem import MACCSkeys
+from rdkit.Chem import AllChem
 from rdkit.Chem import Descriptors
 
 MODEL_SAVE_PATH = os.path.join(os.path.dirname(__file__), "..", "models", "trained_models.pkl")
@@ -55,7 +55,7 @@ def resolve_name_to_smiles(name):
     return None, None
 
 def generate_features_for_hits(smiles_list, descriptor_names):
-    maccs_features = []
+    morgan_features = []
     rdkit_2d_features = []
     valid_indices = []
     
@@ -65,11 +65,12 @@ def generate_features_for_hits(smiles_list, descriptor_names):
             continue
         valid_indices.append(i)
         
-        # 1. MACCS Keys
-        maccs = list(MACCSkeys.GenMACCSKeys(mol))[1:]
-        maccs_features.append(maccs)
+        # 1. Morgan Fingerprint (ECFP4, 2048 bits)
+        fp = AllChem.GetMorganFingerprintAsBitVect(mol, radius=2, nBits=2048)
+        morgan_bits = list(fp)
+        morgan_features.append(morgan_bits)
         
-        # 2. RDKit 2D Descriptors
+        # 2. RDKit 2D physical descriptors
         desc_values = []
         for name in descriptor_names:
             try:
@@ -81,15 +82,20 @@ def generate_features_for_hits(smiles_list, descriptor_names):
                 desc_values.append(0.0)
         rdkit_2d_features.append(desc_values)
         
-    return np.array(maccs_features), np.array(rdkit_2d_features), valid_indices
+    return np.array(morgan_features), np.array(rdkit_2d_features), valid_indices
 
 def main():
+    if not os.path.exists(MODEL_SAVE_PATH):
+        print(f"Error: {MODEL_SAVE_PATH} not found. Run train_ml.py first.")
+        return
+        
     # Load model package
     with open(MODEL_SAVE_PATH, "rb") as f:
         saved_data = pickle.load(f)
         
     models = saved_data["models"]
     scaler = saved_data["scaler"]
+    selector = saved_data["selector"]
     descriptor_names = saved_data["descriptor_names"]
     
     resolved_hits = []
@@ -115,13 +121,25 @@ def main():
     cids_list = [h["cid"] for h in resolved_hits]
     
     # Extract features
-    maccs_feats, rdkit_feats, valid_idx = generate_features_for_hits(smiles_list, descriptor_names)
+    morgan_feats, rdkit_feats, valid_idx = generate_features_for_hits(smiles_list, descriptor_names)
     
     # Scale physical features using the saved scaler
     rdkit_feats_scaled = scaler.transform(rdkit_feats)
     
-    # Combine features
-    X = np.hstack((maccs_feats, rdkit_feats_scaled))
+    # Combine features applying same factor (0.05)
+    X = np.hstack((morgan_feats, rdkit_feats_scaled * 0.05))
+    
+    # Select top features using the saved selector
+    X_selected = selector.transform(X)
+    
+    # Vinca inactives for scaffold similarity check
+    vinca_smiles = [
+        "CC[C@@]1(C[C@H]2C[C@@](C3=C(CCN(C2)C1)C4=CC=CC=C4N3)(C5=C(C=C6C(=C5)[C@]78CCN9[C@H]7[C@@](C=CC9)([C@H]([C@@]([C@@H]8N6C)(C(=O)OC)O)OC(=O)C)CC)OC)C(=O)OC)O",
+        "CCC1=C[C@H]2C[C@@](C3=C(CN(C2)C1)C4=CC=CC=C4N3)(C5=C(C=C6C(=C5)[C@]78CCN9[C@H]7[C@@](C=CC9)([C@H]([C@@]([C@@H]8N6C)(C(=O)OC)O)OC(=O)C)CC)OC)C(=O)OC",
+        "CC[C@@]1(C[C@@H]2C[C@@](C3=C(CCN(C2)C1)C4=CC=CC=C4N3)(C5=C(C=C6C(=C5)[C@]78CCN9[C@H]7[C@@](C=CC9)([C@H]([C@@]([C@@H]8N6C)(C(=O)N)O)O)CC)OC)C(=O)OC)O"
+    ]
+    from rdkit import DataStructs
+    vinca_fps = [AllChem.GetMorganFingerprintAsBitVect(Chem.MolFromSmiles(s), 2, 2048) for s in vinca_smiles]
     
     # Predict
     predictions = []
@@ -129,6 +147,11 @@ def main():
         comp_name = names_list[orig_idx]
         smiles = smiles_list[orig_idx]
         cid = cids_list[orig_idx]
+        
+        # Calculate maximum similarity to Vinca inactives
+        mol = Chem.MolFromSmiles(smiles)
+        fp = AllChem.GetMorganFingerprintAsBitVect(mol, radius=2, nBits=2048)
+        max_vinca_sim = max([DataStructs.TanimotoSimilarity(fp, v_fp) for v_fp in vinca_fps])
         
         comp_results = {
             "CompoundName": comp_name,
@@ -138,8 +161,11 @@ def main():
         
         probs = []
         for model_name, model in models.items():
-            prob = model.predict_proba(X[idx:idx+1])[:, 1][0]
-            pred = model.predict(X[idx:idx+1])[0]
+            prob = model.predict_proba(X_selected[idx:idx+1])[:, 1][0]
+            # Apply Vinca similarity penalty if highly similar to Vinca inactives
+            if max_vinca_sim > 0.70:
+                prob = prob * (1.0 - max_vinca_sim)
+            pred = 1 if prob >= 0.50 else 0
             comp_results[f"{model_name}_Prob"] = prob
             comp_results[f"{model_name}_Prediction"] = "Active" if pred == 1 else "Inactive"
             probs.append(prob)
@@ -154,17 +180,18 @@ def main():
     df = df.sort_values(by="Consensus_Active_Prob", ascending=False)
     
     # Save predictions to CSV
+    os.makedirs(os.path.dirname(OUTPUT_PREDICTIONS_CSV), exist_ok=True)
     df.to_csv(OUTPUT_PREDICTIONS_CSV, index=False)
     print(f"\nFinal prediction results saved to: {OUTPUT_PREDICTIONS_CSV}")
     
     # Print formatted output
-    print("\n" + "="*80)
-    print("                      ML HIT SCREENING REPORT")
-    print("="*80)
+    print("\n" + "="*90)
+    print("                      ML HIT SCREENING REPORT ( Morgan ECFP4 + RDKit 2D )")
+    print("="*90)
     
     cols = ["CompoundName", "PubChem_CID", "Consensus_Active_Prob", "Consensus_Class"]
     print(df[cols].to_string(index=False))
-    print("="*80)
+    print("="*90)
 
 if __name__ == "__main__":
     main()
