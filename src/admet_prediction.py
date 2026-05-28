@@ -20,8 +20,8 @@ CONTROLS = [
 
 def calculate_esol_logs(mol):
     """
-    Calculate ESOL LogS (Aqueous Solubility) based on Delaney's model:
-    LogS = 0.16 - 0.63*LogP - 0.0062*MW - 0.0062*RotatableBonds + 0.05*AromaticProportion
+    Calculate ESOL LogS (Aqueous Solubility) based on Delaney's model (2004):
+    LogS = 0.16 - 0.63*LogP - 0.0062*MW + 0.066*RotatableBonds - 0.74*AromaticProportion
     """
     logp = Descriptors.MolLogP(mol)
     mw = Descriptors.MolWt(mol)
@@ -31,7 +31,7 @@ def calculate_esol_logs(mol):
     aromatic_atoms = [atom for atom in mol.GetAtoms() if atom.GetIsAromatic()]
     aromatic_prop = len(aromatic_atoms) / mol.GetNumAtoms() if mol.GetNumAtoms() > 0 else 0
     
-    logs = 0.16 - (0.63 * logp) - (0.0062 * mw) - (0.0062 * rtb) + (0.05 * aromatic_prop)
+    logs = 0.16 - (0.63 * logp) - (0.0062 * mw) + (0.066 * rtb) - (0.74 * aromatic_prop)
     return logs
 
 def check_pains_filter(mol):

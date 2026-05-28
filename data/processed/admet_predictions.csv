@@ -1,11 +1,11 @@
 CompoundName,Type,ML_Active_Prob,MW,LogP,HBD,HBA,RotatableBonds,TPSA,ESOL_LogS,Est_Solubility_mg_L,Lipinski_Violations,PAINS_Alert
-27-O-acetyl-Withaferin A,Hit Candidate,0.5701701935447314,512.64,3.92,1,7,4,102.43,-5.52,1.57,1,Clean
-Withanolide A,Hit Candidate,0.5318870393415491,470.61,3.5,2,6,2,96.36,-4.97,5.02,0,Clean
-Withaferin A,Hit Candidate,0.519424694386863,470.61,3.35,2,6,3,96.36,-4.89,6.08,0,Clean
-Pristimerin,Hit Candidate,0.5185403374124391,464.65,6.79,1,4,1,63.6,-7.0,0.05,1,Clean
-Celastrol,Hit Candidate,0.500391224314124,450.62,6.7,2,3,1,74.6,-6.86,0.06,1,Clean
+27-O-acetyl-Withaferin A,Hit Candidate,0.5701701935447314,512.64,3.92,1,7,4,102.43,-5.23,3.04,1,Clean
+Withanolide A,Hit Candidate,0.5318870393415491,470.61,3.5,2,6,2,96.36,-4.83,7.0,0,Clean
+Withaferin A,Hit Candidate,0.519424694386863,470.61,3.35,2,6,3,96.36,-4.67,10.01,0,Clean
+Pristimerin,Hit Candidate,0.5185403374124391,464.65,6.79,1,4,1,63.6,-6.93,0.05,1,Clean
+Celastrol,Hit Candidate,0.500391224314124,450.62,6.7,2,3,1,74.6,-6.79,0.07,1,Clean
 Tingenone,Hit Candidate,0.4712721787820272,420.59,6.42,1,3,0,54.37,-6.49,0.14,1,Clean
-alpha-Glycyrrhizin,Hit Candidate,0.4569175429675288,822.94,2.25,8,13,7,267.04,-6.4,0.33,3,Clean
-Paclitaxel,Control Drug (Active),1.0,853.92,3.74,4,14,10,221.29,-7.54,0.02,2,Clean
-Docetaxel,Control Drug (Active),1.0,807.89,3.26,5,14,8,224.45,-6.94,0.09,2,Clean
-Cabazitaxel,Control Drug (Active),1.0,835.94,4.57,3,14,10,202.45,-7.95,0.01,2,Clean
+alpha-Glycyrrhizin,Hit Candidate,0.4569175429675288,822.94,2.25,8,13,7,267.04,-5.89,1.05,3,Clean
+Paclitaxel,Control Drug (Active),1.0,853.92,3.74,4,14,10,221.29,-7.04,0.08,2,Clean
+Docetaxel,Control Drug (Active),1.0,807.89,3.26,5,14,8,224.45,-6.53,0.24,2,Clean
+Cabazitaxel,Control Drug (Active),1.0,835.94,4.57,3,14,10,202.45,-7.39,0.03,2,Clean

@@ -157,6 +157,16 @@ def clean_and_process(raw_activities):
     return actives, inactives
 
 def main():
+    if os.path.exists(OUTPUT_CSV):
+        try:
+            df_existing = pd.read_csv(OUTPUT_CSV)
+            if df_existing.shape[0] == 300 and "Class" in df_existing.columns:
+                print(f"High-quality processed dataset already exists with 300 compounds at: {OUTPUT_CSV}")
+                print("Skipping ChEMBL API queries and reusing the existing dataset for robustness against public API downtime.")
+                return
+        except Exception as e:
+            print(f"Found existing file but failed to read it: {e}. Proceeding with ChEMBL API query...")
+
     raw_data = fetch_tubulin_activities()
     mined_actives, mined_inactives = clean_and_process(raw_data)
     
@@ -183,6 +193,15 @@ def main():
     # Increase training set size: exactly 150 actives and 150 inactives (total 300 compounds)
     aim_count = 150
     
+    if len(mined_actives) < (aim_count - len(ref_actives)) or len(mined_inactives) < (aim_count - len(ref_inactives)):
+        print("\n[ERROR] Not enough mined compounds from ChEMBL to generate a balanced training set.")
+        print("ChEMBL API might be undergoing service issues or returned empty results.")
+        if os.path.exists(OUTPUT_CSV):
+            print("Reusing existing backup dataset to prevent pipeline abort...")
+            return
+        else:
+            raise ValueError("Insufficient data retrieved from ChEMBL API and no pre-existing dataset found.")
+            
     np.random.seed(42)
     # Sample from mined actives to reach exactly 150
     num_actives_to_sample = aim_count - len(ref_actives)

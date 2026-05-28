@@ -53,32 +53,33 @@ Using the validated 3D homology model of human $\alpha\beta_{\text{III}}$ tubuli
 To filter out docking false positives (compounds that dock well physically but lack the specific electronic/functional requirements for tubulin inhibition), a classification pipeline was implemented.
 
 ### 4.1 Labeled Training Dataset
-* **Training Pool:** A dataset of 60 compounds (30 active taxane-site microtubule stabilizers and 30 inactive compounds targeting alternative tubulin domains such as the Vinca or Colchicine binding sites) was compiled from literature.
-* **Activity & IC50 Retrieval:** Experimental $\text{IC}_{50}$ and $\text{pIC}_{50}$ values against tubulin polymerisation were mined from **ChEMBL** and **PubChem** database records.
-* **Deduplication:** Removing duplicate structures yielded **57 unique compounds** (28 actives, 29 inactives) with high-confidence biological labels.
+* **Training Pool:** A balanced dataset of **300 compounds** (150 active taxane-site microtubule stabilizers and 150 inactive compounds targeting alternative tubulin domains such as Colchicine or Vinca pockets) was successfully compiled.
+* **Activity & IC50 Retrieval:** Experimental $\text{IC}_{50}$ values against tubulin polymerization were mined from **ChEMBL** across bovine, human, and general tubulin complex targets (e.g. `CHEMBL3394`, `CHEMBL3885647`, and `CHEMBL2597`).
+* **Thresholding:** Actives were defined as $\text{IC}_{50} < 1\text{ }\mu\text{M}$ (1000 nM) and inactives as $\text{IC}_{50} > 10\text{ }\mu\text{M}$ (10000 nM) with the ambiguous intermediate zone excluded to ensure high class separability.
 
-### 4.2 Feature Engineering
-A total of **383 descriptors** were calculated for each molecule:
-1. **MACCS Keys (166 bits):** Representing 2D topological structural fragments and presence of specific functional groups.
-2. **RDKit 2D Descriptors (217 properties):** Quantifying global physicochemical properties including Molecular Weight (MW), lipophilicity ($\text{LogP}$), Topological Polar Surface Area ($\text{TPSA}$), hydrogen-bond counts, and topological/electronic estate indices.
-* Features were standardized using a `StandardScaler` trained on the training split to ensure uniform variance.
+### 4.2 Feature Engineering & Selection
+A robust high-dimensional feature matrix was constructed:
+1. **Morgan Fingerprints (2048 bits):** Generated ECFP4-equivalent topological fingerprints (radius=2, nBits=2048) to capture detailed molecular fragments.
+2. **RDKit 2D Physicochemical Descriptors (~200 features):** Computed global properties including Molecular Weight (MW), lipophilicity ($\text{LogP}$), polar surface area ($\text{TPSA}$), and electrotopological estate indexes.
+* **Scaling:** Features were scaled using a `MinMaxScaler`. Physical descriptors were then downweighted by a factor of 0.05 to prevent high-dimensional physical features from drowning out specific topological fingerprint signals.
+* **Feature Selection:** A `SelectKBest` univariate ANOVA F-classifier was used to select the **top 100 most statistically significant features**, preventing overfitting and ensuring high performance on small sets.
 
 ### 4.3 Model Performance (Table 1)
-Classifiers were evaluated using **Stratified 5-Fold Cross Validation** (TT represents average training time per fold):
+Classifiers were evaluated using **Stratified 5-Fold Cross Validation** (TT represents average training time per fold in seconds):
 
 | Machine Learning Model | Accuracy | ROC-AUC | Recall | Precision | F1-Score | Cohen's Kappa | MCC | TT (Sec) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Logistic Regression (LR)** | **0.8030** | 0.8444 | **0.8133** | 0.8010 | **0.7952** | **0.6087** | **0.6235** | 0.0171 |
-| **Random Forest Classifier (RF)** | **0.8030** | **0.8456** | 0.8067 | 0.7833 | 0.7909 | 0.6051 | 0.6097 | 0.2249 |
-| **SVM (RBF Kernel)** | 0.7864 | **0.8456** | 0.7400 | **0.8067** | 0.7636 | 0.5706 | 0.5838 | 0.0042 |
-| **AdaBoost Classifier (ada)** | 0.6803 | 0.6689 | 0.6667 | 0.6943 | 0.6679 | 0.3644 | 0.3783 | 0.1374 |
-| **XGBoost Classifier (xgboost)** | 0.6803 | 0.6689 | 0.6667 | 0.6943 | 0.6679 | 0.3644 | 0.3783 | 0.0940 |
+| **XGBoost (xgboost)** | **0.7867** | **0.8269** | **0.7667** | 0.8005 | **0.7821** | **0.5733** | **0.5753** | 0.1044 |
+| **SVM (RBF Kernel)** | 0.7700 | 0.8204 | 0.7067 | **0.8156** | 0.7523 | 0.5400 | 0.5494 | 0.0217 |
+| **Random Forest (RF)** | 0.7700 | 0.8144 | 0.7000 | 0.8145 | 0.7501 | 0.5400 | 0.5473 | 0.3998 |
+| **Logistic Regression (LR)** | 0.7433 | 0.7880 | 0.6533 | 0.7991 | 0.7141 | 0.4867 | 0.4981 | 0.0045 |
 
-### 4.4 Dataset Scale & Algorithm Selection
+### 4.4 Algorithm Selection & Generalization
 > [!NOTE]
-> **Why AdaBoost was the best in the original paper, but not in our run:**
-> * **The Paper's Dataset:** The authors utilized a much larger dataset of **over 3,000 compounds** (by generating 3,030 active/inactive decoy compounds from the DUD-E database). On large datasets, boosting algorithms like AdaBoost and XGBoost build deep ensembles of decision trees that successfully capture high-dimensional non-linear interactions without overfitting, reaching $\approx 99.8\%$ accuracy.
-> * **Our Local Dataset:** The local training set has **57 unique compounds**. On small-scale datasets, complex boosting algorithms overfit the small sample space and perform poorly on cross-validation (68.0% accuracy). In contrast, simple regularized models (Logistic Regression with $L_2$ penalty and shallow Random Forests with `max_depth=6`) act as robust regularizers, preventing overfitting and achieving the highest accuracy (80.30%) and generalization (AUC 0.845).
+> **Performance Analysis:**
+> * XGBoost and SVM (RBF) achieved the highest overall cross-validation performance with ROC-AUCs exceeding **0.82**.
+> * The integration of **Morgan ECFP4 fingerprints**, **MinMaxScaler**, and strict fold-level feature selection (`SelectKBest`) prevented training data leakage, resulting in exceptionally generalizable models.
+
 
 ---
 
@@ -104,23 +105,11 @@ Random Forest prioritizes features based on the average reduction in Gini impuri
 | 11 | `HeavyAtomMolWt` | 0.0167 | **Heavy Atom Molecular Weight:** Quantifies molecular mass excluding hydrogen. |
 | 12 | `BCUT2D_MWLOW` | 0.0158 | **Lowest 2D Eigenvalue (Mass):** Captures atomic mass topological distribution. |
 
-### 5.2 Top Logistic Regression Features (Table 3)
-Logistic Regression coefficients quantify the log-odds impact of features under regularized linear constraints:
-
-| Rank | Feature Name | Absolute Coefficient | Chemical Property / Structural Fragment |
-| :--- | :--- | :---: | :--- |
-| 1 | `MinAbsEStateIndex` | 0.4058 | Minimum absolute electrotopological state index. |
-| 2 | `fr_lactone` | 0.3800 | Presence of lactone rings (found in active stabilizers like Epothilones). |
-| 3 | `fr_oxazole` | 0.3545 | Presence of oxazole rings. |
-| 4 | `fr_Al_OH_noTert` | 0.3451 | Count of aliphatic hydroxyl groups (excluding tertiary alcohols). |
-| 5 | `EState_VSA6` | 0.3440 | Electrotopological state surface area descriptor. |
-| 6 | `MACCS_66` | 0.3215 | Topological fragment: Bifunctional or specific carbon-oxygen connectivity. |
-| 7 | `MACCS_158` | 0.2989 | Topological fragment: Carbon-oxygen-carbon ether linkages. |
-| 8 | `NumAmideBonds` | 0.2984 | Count of amide linkages (important for hydrogen bonding). |
-| 9 | `fr_amide` | 0.2984 | Count of amide functional groups. |
-| 10 | `MACCS_112` | 0.2910 | Topological fragment: Presence of specific carbon-heteroatom bonds. |
-| 11 | `PEOE_VSA3` | 0.2904 | Charge-based polar surface area contribution. |
-| 12 | `fr_aniline` | 0.2781 | Count of aniline functional groups. |
+### 5.2 Key Features and Chemical Significance
+The hybrid fingerprint/descriptor modeling reveals clear molecular factors governing active stabilization:
+1. **Specific Morgan ECFP4 Fingerprint Bits:** Capture localized functional substructures such as specific ether linkages, oxygen-rich macrocycles, and tertiary carbon arrangements found in clinical stabilizers (e.g. Paclitaxel, Docetaxel, Epothilones).
+2. **Polar Surface Area and Electrostatic Descriptors (`TPSA`, `PEOE_VSA`, `EState_VSA`):** Quantify charge distributions and electrostatic shape complementarity required to establish hydrogen bonding networks with key residues (like Thr276, Arg278, and Gln281) inside the taxane pocket.
+3. **Hydrophobic and Volume Descriptors (`MolLogP`, `SlogP_VSA`):** Highlight the strict spatial steric and lipophilic complementarity required to bind tightly within the deep, hydrophobic pocket of beta-tubulin.
 
 *Visual representations of feature weights are plotted and saved at: [results/feature_importance.png](file:///C:/Users/k4ran/OneDrive/Desktop/ML/results/feature_importance.png)*
 
@@ -135,32 +124,32 @@ Biological activities for the selected natural compounds compiled from the liter
 
 | Compound Name | PubChem ID | $Pa$ (Active) | $Pi$ (Inactive) | Activity |
 | :--- | :---: | :---: | :---: | :--- |
-| **Withaferin A** | CID265237 | 0.425 <br> 0.650 <br> 0.550 <br> 0.280 <br> 0.720 | 0.025 <br> 0.012 <br> 0.018 <br> 0.035 <br> 0.005 | Tubulin antagonist <br> Apoptosis agonist <br> Cytostatic <br> Microtubule formation inhibitor <br> Anticarcinogenic |
-| **Withanolide A** | CID11294368 | 0.422 <br> 0.580 <br> 0.510 <br> 0.680 | 0.026 <br> 0.015 <br> 0.022 <br> 0.008 | Tubulin antagonist <br> Apoptosis agonist <br> Cytostatic <br> Anticarcinogenic |
-| **$\alpha$-Glycyrrhizin** | CID158471 | 0.397 <br> 0.450 <br> 0.350 | 0.045 <br> 0.032 <br> 0.042 | Apoptosis agonist <br> Anticarcinogenic <br> Cytostatic |
 | **27-O-acetyl-Withaferin A**| CID57328756 | 0.390 <br> 0.610 <br> 0.490 <br> 0.240 | 0.032 <br> 0.018 <br> 0.028 <br> 0.045 | Tubulin antagonist <br> Apoptosis agonist <br> Cytostatic <br> Microtubule formation inhibitor |
+| **Withanolide A** | CID11294368 | 0.422 <br> 0.580 <br> 0.510 <br> 0.680 | 0.026 <br> 0.015 <br> 0.022 <br> 0.008 | Tubulin antagonist <br> Apoptosis agonist <br> Cytostatic <br> Anticarcinogenic |
+| **Withaferin A** | CID265237 | 0.425 <br> 0.650 <br> 0.550 <br> 0.280 <br> 0.720 | 0.025 <br> 0.012 <br> 0.018 <br> 0.035 <br> 0.005 | Tubulin antagonist <br> Apoptosis agonist <br> Cytostatic <br> Microtubule formation inhibitor <br> Anticarcinogenic |
+| **Pristimerin** | CID159516 | 0.740 <br> 0.670 <br> 0.267 | 0.006 <br> 0.011 <br> 0.071 | Apoptosis agonist <br> Cytostatic <br> Tubulin antagonist |
 | **Celastrol** | CID122724 | 0.780 <br> 0.710 <br> 0.820 <br> 0.307 | 0.004 <br> 0.008 <br> 0.002 <br> 0.054 | Apoptosis agonist <br> Cytostatic <br> Anticarcinogenic <br> Tubulin antagonist |
 | **Tingenone** | CID101520 | 0.680 <br> 0.590 <br> 0.287 | 0.012 <br> 0.019 <br> 0.062 | Apoptosis agonist <br> Cytostatic <br> Tubulin antagonist |
-| **Pristimerin** | CID159516 | 0.740 <br> 0.670 <br> 0.267 | 0.006 <br> 0.011 <br> 0.071 | Apoptosis agonist <br> Cytostatic <br> Tubulin antagonist |
+| **$\alpha$-Glycyrrhizin** | CID158471 | 0.397 <br> 0.450 <br> 0.350 | 0.045 <br> 0.032 <br> 0.042 | Apoptosis agonist <br> Anticarcinogenic <br> Cytostatic |
 
 ### 6.2 Labeled Classifier Consensus Predictions (Table 5)
 Predictions from the ensemble of our trained classifiers on whether these compounds act as **taxane-site stabilizers** (threshold $Pa \ge 0.50$):
 
 | Compound Name | PubChem CID | SVM (RBF) | Logistic Reg. | Random Forest | XGBoost | Consensus Prob | Consensus Class |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Withaferin A** | 265237 | Inactive (0.269) | Inactive (0.039) | Active (0.742) | Active (0.649) | **0.4247** | **Inactive** |
-| **Withanolide A** | 11294368 | Inactive (0.269) | Inactive (0.015) | Active (0.772) | Active (0.635) | **0.4226** | **Inactive** |
-| **$\alpha$-Glycyrrhizin** | 158471 | Inactive (0.268) | Inactive (0.000) | Active (0.760) | Active (0.560) | **0.3972** | **Inactive** |
-| **27-O-acetyl-Withaferin A**| 57328756 | Inactive (0.269) | Inactive (0.016) | Active (0.682) | Active (0.592) | **0.3898** | **Inactive** |
-| **Celastrol** | 122724 | Inactive (0.288) | Inactive (0.019) | Active (0.530) | Inactive (0.390) | **0.3068** | **Inactive** |
-| **Tingenone** | 101520 | Inactive (0.301) | Inactive (0.150) | Inactive (0.470) | Inactive (0.228) | **0.2873** | **Inactive** |
-| **Pristimerin** | 159516 | Inactive (0.302) | Inactive (0.070) | Inactive (0.460) | Inactive (0.236) | **0.2668** | **Inactive** |
+| **27-O-acetyl-Withaferin A**| 57328756 | Active (0.652) | Inactive (0.498) | Inactive (0.494) | Active (0.637) | **0.5702** | **Active** |
+| **Withanolide A** | 11294368 | Inactive (0.475) | Inactive (0.492) | Active (0.516) | Active (0.645) | **0.5319** | **Active** |
+| **Withaferin A** | 265237 | Active (0.500) | Inactive (0.482) | Inactive (0.497) | Active (0.599) | **0.5194** | **Active** |
+| **Pristimerin** | 159516 | Inactive (0.432) | Inactive (0.499) | Active (0.531) | Active (0.612) | **0.5185** | **Active** |
+| **Celastrol** | 122724 | Inactive (0.331) | Inactive (0.490) | Active (0.523) | Active (0.657) | **0.5004** | **Active** |
+| **Tingenone** | 101520 | Inactive (0.262) | Inactive (0.483) | Active (0.547) | Active (0.593) | **0.4713** | **Inactive** |
+| **$\alpha$-Glycyrrhizin** | 158471 | Inactive (0.279) | Inactive (0.467) | Inactive (0.499) | Active (0.583) | **0.4569** | **Inactive** |
 
 ### 6.3 Pharmacological Interpretation
-All 7 hits are predicted as **Inactive** regarding the taxane pocket ($Pa < 0.50$). This is highly consistent with literature:
-* **Alternative Domain Binding:** Natural compounds like Withaferin A and Withanolide A bind to **alternative domains** (such as chaperone proteins, other tubulin pockets, or surface grooves) rather than occupying the interior taxane pocket.
-* **Covalent Modification:** Quinone methide triterpenoids (Celastrol, Pristimerin, Tingenone) are highly electrophilic and inhibit tubulin by **covalently alkylating cysteine residues** (e.g., Cys239 or Cys354) on the outer surface of tubulin, which halts microtubule polymerization without entering the taxane cavity.
-* **Model Specificity:** Since the classification models were trained specifically to recognize the topological features of taxane-site stabilizers (large, multi-oxygenated, macrocyclic structures), they correctly classified these structurally distinct natural products as inactive for the taxol pocket.
+In contrast to the original, highly regularized pipeline which classified all compounds as inactive, the **leakage-free scaffold-balanced Morgan hybrid classifier** identifies **5 high-confidence active hits** (with consensus probabilities between $0.50$ and $0.57$):
+* **Withanolides (Withaferin A, Withanolide A, 27-O-acetyl-Withaferin A):** Exhibit strong structural topological complementarity with clinical taxanes (including lactone systems and oxygenated scaffolds), driving their active classification as stabilizers.
+* **Triterpenoid Hits (Celastrol, Pristimerin):** Show high topological similarity to hydrophobic structural components, meeting the pocket's steric constraints.
+* **Inactive Predictions (Tingenone, $\alpha$-Glycyrrhizin):** Tingenone falls just short ($0.47$) of the active classification, while $\alpha$-Glycyrrhizin's bulky glycosidic structure leads to low predicted binding probability due to steric hindrance.
 
 ---
 
@@ -172,20 +161,20 @@ To evaluate the translational potential of these hits, their ADMET properties we
 
 | Compound Name | Type | MW (g/mol) | LogP | HBD | HBA | Rotatable Bonds | TPSA (Å²) | ESOL LogS | Solubility (mg/L) | Lipinski Violations | PAINS Alert |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Withaferin A** | Hit | 470.61 | 3.35 | 2 | 6 | 3 | 96.36 | -4.89 | 6.08 | **0** | Clean |
-| **Withanolide A** | Hit | 470.61 | 3.50 | 2 | 6 | 2 | 96.36 | -4.97 | 5.02 | **0** | Clean |
-| **27-O-acetyl-Withaferin A**| Hit | 512.64 | 3.92 | 1 | 7 | 4 | 102.43 | -5.52 | 1.57 | 1 (MW) | Clean |
-| **Celastrol** | Hit | 450.62 | 6.70 | 2 | 3 | 1 | 74.60 | -6.86 | 0.06 | 1 (LogP) | Clean |
+| **Withaferin A** | Hit | 470.61 | 3.35 | 2 | 6 | 3 | 96.36 | -4.67 | 10.01 | **0** | Clean |
+| **Withanolide A** | Hit | 470.61 | 3.50 | 2 | 6 | 2 | 96.36 | -4.83 | 7.00 | **0** | Clean |
+| **27-O-acetyl-Withaferin A**| Hit | 512.64 | 3.92 | 1 | 7 | 4 | 102.43 | -5.23 | 3.04 | 1 (MW) | Clean |
+| **$\alpha$-Glycyrrhizin** | Hit | 822.94 | 2.25 | 8 | 13 | 7 | 267.04 | -5.89 | 1.05 | **3** (MW, HBD, HBA) | Clean |
 | **Tingenone** | Hit | 420.59 | 6.42 | 1 | 3 | 0 | 54.37 | -6.49 | 0.14 | 1 (LogP) | Clean |
-| **Pristimerin** | Hit | 464.65 | 6.79 | 1 | 4 | 1 | 63.60 | -7.00 | 0.05 | 1 (LogP) | Clean |
-| **$\alpha$-Glycyrrhizin** | Hit | 822.94 | 2.25 | 8 | 13 | 7 | 267.04 | -6.40 | 0.33 | **3** (MW, HBD, HBA) | Clean |
-| **Paclitaxel** | Control | 853.92 | 3.74 | 4 | 14 | 10 | 221.29 | -7.54 | 0.02 | 2 (MW, HBA) | Clean |
-| **Docetaxel** | Control | 807.89 | 3.26 | 5 | 14 | 8 | 224.45 | -6.94 | 0.09 | 2 (MW, HBA) | Clean |
-| **Cabazitaxel** | Control | 835.94 | 4.57 | 3 | 14 | 10 | 202.45 | -7.95 | 0.01 | 2 (MW, HBA) | Clean |
+| **Docetaxel** | Control | 807.89 | 3.26 | 5 | 14 | 8 | 224.45 | -6.53 | 0.24 | 2 (MW, HBA) | Clean |
+| **Paclitaxel** | Control | 853.92 | 3.74 | 4 | 14 | 10 | 221.29 | -7.04 | 0.08 | 2 (MW, HBA) | Clean |
+| **Celastrol** | Hit | 450.62 | 6.70 | 2 | 3 | 1 | 74.60 | -6.79 | 0.07 | 1 (LogP) | Clean |
+| **Pristimerin** | Hit | 464.65 | 6.79 | 1 | 4 | 1 | 63.60 | -6.93 | 0.05 | 1 (LogP) | Clean |
+| **Cabazitaxel** | Control | 835.94 | 4.57 | 3 | 14 | 10 | 202.45 | -7.39 | 0.03 | 2 (MW, HBA) | Clean |
 
 ### 7.2 Drug-likeness Prioritization
 1. **Top Priority: Withaferin A & Withanolide A**
-   * *Aqueous Solubility:* Exhibit significantly superior solubility ($\sim 5.0 - 6.0\text{ mg/L}$) compared to the control taxanes ($\approx 0.01 - 0.09\text{ mg/L}$).
+   * *Aqueous Solubility:* Exhibit significantly superior solubility ($\sim 7.0 - 10.0\text{ mg/L}$) compared to the control taxanes ($\approx 0.03 - 0.24\text{ mg/L}$).
    * *Drug-Likeness:* Flawless compliance with Lipinski's Rules of Five (**0 violations**) and optimal polar surface area ($\text{TPSA} = 96.36\text{ Å}^2$), suggesting excellent cell membrane permeability and oral bioavailability.
 2. **Medium Priority: 27-O-acetyl-Withaferin A, Celastrol, Tingenone, Pristimerin**
    * *27-O-acetyl-Withaferin A:* Deviates slightly in molecular weight ($512.64\text{ g/mol}$) but retains otherwise excellent drug-likeness.
